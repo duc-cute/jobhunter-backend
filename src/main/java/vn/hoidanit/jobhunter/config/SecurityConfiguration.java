@@ -54,17 +54,18 @@ public class SecurityConfiguration {
             ) throws Exception {
         http
                 .csrf(c -> c.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers("/","/login").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oath2) -> oath2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
-                .exceptionHandling(
-                        exceptions -> exceptions
-                                .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) //403
-                                .accessDeniedHandler((new BearerTokenAccessDeniedHandler())) //401
-                )
+//                .exceptionHandling(
+//                        exceptions -> exceptions
+//                                .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) //403
+//                                .accessDeniedHandler((new BearerTokenAccessDeniedHandler())) //401
+//                )
 
                 .formLogin(f -> f.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
