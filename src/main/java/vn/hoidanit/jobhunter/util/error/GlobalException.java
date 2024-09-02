@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import vn.hoidanit.jobhunter.domain.RestResponse;
 
 import java.util.List;
@@ -31,6 +32,17 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 
     }
+    @ExceptionHandler(value = {
+            NoResourceFoundException.class
+    })
+    public  ResponseEntity<RestResponse<Object>> handleNotFoundException(Exception ex) {
+      RestResponse<Object> res = new RestResponse<Object>();
+      res.setStatusCode(HttpStatus.NOT_FOUND.value());
+      res.setError(ex.getMessage());
+      res.setMessage("404 Not Found.URL may not exits...");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
   //  Xử lý ngoại lệ MethodArgumentNotValidException, thường xảy ra khi các tham số đầu vào không hợp lệ
   //  (ví dụ, không đáp ứng các yêu cầu xác thực).
     @ExceptionHandler(MethodArgumentNotValidException.class)

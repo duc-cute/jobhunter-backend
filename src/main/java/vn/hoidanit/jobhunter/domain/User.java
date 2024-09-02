@@ -1,9 +1,16 @@
 package vn.hoidanit.jobhunter.domain;
-
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+import vn.hoidanit.jobhunter.util.SercurityUtil;
+import vn.hoidanit.jobhunter.util.constant.GenderEnum;
+
+import java.time.Instant;
 
 @Entity
+@Getter
+@Setter
 @Table(name ="users")
 public class User {
 
@@ -11,41 +18,48 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "email không được để trống")
     private String email;
 
+    @NotBlank(message = "name không được để trống")
     private String name;
 
+    @NotBlank(message = "password không được để trống")
     private String password;
 
-    public String getPassword() {
-        return password;
+    private String address;
+
+    private int age;
+
+    @Enumerated(EnumType.STRING)
+    private GenderEnum gender;
+
+    private String refreshToken;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private String createdBy;
+
+    private String updatedBy;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createdBy = SercurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SercurityUtil.getCurrentUserLogin().get()
+                : "";
+
+        this.createdAt = Instant.now();
+    }
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updatedBy = SercurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SercurityUtil.getCurrentUserLogin().get()
+                : "";
+
+        this.updatedAt = Instant.now();
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 }
