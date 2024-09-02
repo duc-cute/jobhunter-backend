@@ -13,10 +13,12 @@ import vn.hoidanit.jobhunter.domain.RestResponse;
 import vn.hoidanit.jobhunter.domain.dto.CompanyDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1")
 public class CompanyController {
     private final CompanyService companyService;
 
@@ -32,6 +34,7 @@ public class CompanyController {
     }
 
     @GetMapping("/companies")
+    @ApiMessage("fetch companies all")
     public  ResponseEntity<ResultPaginationDTO> getAllCompany(@Filter Specification<Company> spec, Pageable pageable) {
         ResultPaginationDTO result = this.companyService.fetchCompanies(spec,pageable);
         return ResponseEntity.status(HttpStatus.OK).body(result);

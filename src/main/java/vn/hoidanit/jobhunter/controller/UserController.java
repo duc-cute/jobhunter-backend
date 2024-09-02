@@ -1,10 +1,15 @@
 package vn.hoidanit.jobhunter.controller;
 
+import com.turkraft.springfilter.boot.Filter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 
 import java.util.List;
@@ -36,10 +41,10 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>>  getUsers() {
-        List<User> listUser = this.userService.getAllUsers();
+    public ResponseEntity<ResultPaginationDTO>  fetchUsers(@Filter Specification<User> spec, Pageable pageable) {
+        ResultPaginationDTO result = this.userService.getAllUsers(spec,pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(listUser);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
 
     }
 
