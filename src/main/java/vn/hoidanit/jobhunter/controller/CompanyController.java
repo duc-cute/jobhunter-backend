@@ -1,6 +1,9 @@
 package vn.hoidanit.jobhunter.controller;
 
+import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.RestResponse;
 import vn.hoidanit.jobhunter.domain.dto.CompanyDTO;
+import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 
 import java.util.List;
@@ -28,9 +32,9 @@ public class CompanyController {
     }
 
     @GetMapping("/companies")
-    public  ResponseEntity<List<Company>> getAllCompany() {
-        List<Company> list = this.companyService.getAllCompany();
-        return ResponseEntity.status(HttpStatus.OK).body(list);
+    public  ResponseEntity<ResultPaginationDTO> getAllCompany(@Filter Specification<Company> spec, Pageable pageable) {
+        ResultPaginationDTO result = this.companyService.fetchCompanies(spec,pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @PutMapping("/companies")
