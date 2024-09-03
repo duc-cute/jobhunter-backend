@@ -1,7 +1,9 @@
 package vn.hoidanit.jobhunter.util;
 
+import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.JWT;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +15,8 @@ import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.ResLoginDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResUserDTO;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,7 +43,7 @@ public class SercurityUtil {
     @Value("${duccute.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public String createAccessToken(Authentication authentication,ResLoginDTO.UserLogin dto ) {
+    public String createAccessToken(String email,ResLoginDTO.UserLogin dto ) {
         Instant now = Instant.now();
         Instant validity =now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);//tính thời gian hết hạn = lấy now + thời gian expire
 
@@ -49,7 +53,7 @@ public class SercurityUtil {
         JwtClaimsSet claims =JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(authentication.getName())
+                .subject(email)
                 .claim("duccute",dto)
                 .claim("permission",listAuthority)
                 .build();
@@ -99,6 +103,22 @@ public class SercurityUtil {
         return Optional.ofNullable(securityContext.getAuthentication())
                 .filter(authentication -> authentication.getCredentials() instanceof String)
                 .map(authentication -> (String) authentication.getCredentials());
+    }
+
+    public SecretKey getSecretKey() {
+        byte[] keyBytes = Base64.from(jwtKey).decode();
+        return new SecretKeySpec(keyBytes,0,keyBytes.length, SercurityUtil.JWT_ALGORITHM.getName());
+    }
+
+    public Jwt checkValidRefreshToken(String token) {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(SercurityUtil.JWT_ALGORITHM).build();
+            try {
+                return jwtDecoder.decode(token);
+            } catch (Exception e) {
+                System.out.println(">>> JWT error: " + e.getMessage());
+                throw e;
+            }
     }
 
 }
