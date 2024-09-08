@@ -6,16 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.RestResponse;
-import vn.hoidanit.jobhunter.domain.dto.CompanyDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.request.ReqCompanyDTO;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.anotation.ApiMessage;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -27,7 +23,7 @@ public class CompanyController {
     }
 
     @PostMapping("/companies")
-    public ResponseEntity<Company> saveCompany(@Valid @RequestBody CompanyDTO companyDTO) {
+    public ResponseEntity<Company> saveCompany(@Valid @RequestBody ReqCompanyDTO companyDTO) {
         Company newCompany = this.companyService.handleCreate(companyDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCompany);
 
