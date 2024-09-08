@@ -1,52 +1,47 @@
 package vn.hoidanit.jobhunter.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.catalina.security.SecurityUtil;
 import vn.hoidanit.jobhunter.util.SercurityUtil;
+import vn.hoidanit.jobhunter.util.constant.LevelEnum;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name ="companies")
+@Table(name="jobs")
 @Getter
 @Setter
-public class Company {
-
+public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;
-
+    private String location;
+    private double salary;
+    private int quantity;
+    private LevelEnum level;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
-
-    private String address;
-
-    private String logo;
-
-   // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    private Instant startDate;
+    private Instant longDate;
+    private boolean active;
     private Instant createdAt;
-
     private Instant updatedAt;
-
     private String createdBy;
-
     private String updatedBy;
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
-    @OneToMany(mappedBy = "company",fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
-    List<User> listUser;
+    @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    private List<Skill> skills;
 
-    @OneToMany(mappedBy = "jobs",fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Job> jobs;
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -56,7 +51,6 @@ public class Company {
 
         this.createdAt = Instant.now();
     }
-
     @PreUpdate
     public void handleBeforeUpdate() {
         this.updatedBy = SercurityUtil.getCurrentUserLogin().isPresent() == true
@@ -65,6 +59,9 @@ public class Company {
 
         this.updatedAt = Instant.now();
     }
+
+
+
 
 
 }
