@@ -37,6 +37,11 @@ public class User {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+
     private Instant createdAt;
 
     private Instant updatedAt;

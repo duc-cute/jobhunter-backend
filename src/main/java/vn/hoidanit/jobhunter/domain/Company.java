@@ -1,6 +1,7 @@
 package vn.hoidanit.jobhunter.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import vn.hoidanit.jobhunter.util.SercurityUtil;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name ="companies")
@@ -37,6 +39,10 @@ public class Company {
     private String createdBy;
 
     private String updatedBy;
+
+    @OneToMany(mappedBy = "company",fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<User> listUser;
 
     @PrePersist
     public void handleBeforeCreate() {

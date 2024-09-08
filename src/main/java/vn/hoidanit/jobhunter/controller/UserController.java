@@ -69,6 +69,7 @@ public class UserController {
     @PutMapping("/users")
     @ApiMessage("Update a user")
     public ResponseEntity<ResUpdateUserDTO> updateUserById(@RequestBody User user) throws IdInvalidException {
+
         User userUpdate = this.userService.updateUser(user);
         if(userUpdate == null) throw new IdInvalidException("User với Id ="+ user.getId()+" không tồn tại!");
         return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(userUpdate));
