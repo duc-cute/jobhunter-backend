@@ -1,7 +1,9 @@
 package vn.hoidanit.jobhunter.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import vn.hoidanit.jobhunter.util.SercurityUtil;
@@ -11,15 +13,19 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name="jobs")
 @Getter
 @Setter
+@Table(name="jobs")
+
 public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "Name is not null")
     private String name;
+
+    @NotBlank(message = "Location is not null")
     private String location;
     private double salary;
     private int quantity;
@@ -27,8 +33,10 @@ public class Job {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
     private Instant startDate;
-    private Instant longDate;
+    private Instant endDate;
+
     private boolean active;
+
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
@@ -38,7 +46,7 @@ public class Job {
     private Company company;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties(value = { "jobs" })
     @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private List<Skill> skills;
 
@@ -59,9 +67,6 @@ public class Job {
 
         this.updatedAt = Instant.now();
     }
-
-
-
 
 
 }
