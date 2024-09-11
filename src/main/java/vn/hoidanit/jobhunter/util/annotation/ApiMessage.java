@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.util.anotation;
+package vn.hoidanit.jobhunter.util.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
