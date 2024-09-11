@@ -24,7 +24,7 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
                                   Class  selectedConverterType,
                                   ServerHttpRequest request,
                                   ServerHttpResponse response) {
-        if (body instanceof String) {
+        if (body instanceof String || body instanceof Resource) {
             return body;
         }
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
