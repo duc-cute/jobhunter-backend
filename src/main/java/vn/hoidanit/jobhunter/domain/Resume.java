@@ -1,61 +1,41 @@
 package vn.hoidanit.jobhunter.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import vn.hoidanit.jobhunter.util.SercurityUtil;
-import vn.hoidanit.jobhunter.util.constant.LevelEnum;
+import vn.hoidanit.jobhunter.util.constant.StatusEnum;
 
 import java.time.Instant;
-import java.util.List;
 
 @Entity
+@Table(name = "resumes")
 @Getter
 @Setter
-@Table(name="jobs")
-
-public class Job {
+public class Resume {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "Name is not null")
-    private String name;
+    @NotBlank(message = "email không được để trống")
+    private String email;
 
-    @NotBlank(message = "Location is not null")
-    private String location;
-    private double salary;
-    private int quantity;
-
+    @NotBlank(message = "url không được để trống (upload cv chưa thành công)")
+    private String url;
     @Enumerated(EnumType.STRING)
-    private LevelEnum level;
-    @Column(columnDefinition = "MEDIUMTEXT")
-    private String description;
-    private Instant startDate;
-    private Instant endDate;
-
-    private boolean active;
-
+    private StatusEnum status;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
     @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @JoinColumn(name = "job_id")
+    private Job job;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "jobs" })
-    @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private List<Skill> skills;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "job")
-    @JsonIgnore
-    List<Resume> resumes;
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -73,6 +53,4 @@ public class Job {
 
         this.updatedAt = Instant.now();
     }
-
-
 }

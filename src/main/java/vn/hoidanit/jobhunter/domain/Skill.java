@@ -30,6 +30,7 @@ public class Skill {
     @JsonIgnore
     private List<Job> jobs;
 
+
     @PrePersist
     public void handleBeforeCreate() {
         this.createdBy = SercurityUtil.getCurrentUserLogin().isPresent() == true

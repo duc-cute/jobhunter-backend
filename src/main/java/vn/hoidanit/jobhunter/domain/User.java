@@ -1,4 +1,5 @@
 package vn.hoidanit.jobhunter.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import vn.hoidanit.jobhunter.util.SercurityUtil;
 import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +42,11 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    List<Resume> resumes;
+
 
 
     private Instant createdAt;
