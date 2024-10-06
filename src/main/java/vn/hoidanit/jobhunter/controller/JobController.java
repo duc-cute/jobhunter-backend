@@ -37,7 +37,7 @@ public class JobController {
         if(currentJob == null) {
             throw  new IdInvalidException("Job " + dto.getName() + " is not found!");
         }
-        ResUpdateJobDTO updateJob = this.jobService.handleUpdateJob(dto);
+        ResUpdateJobDTO updateJob = this.jobService.handleUpdateJob(dto,currentJob);
         return new ResponseEntity(updateJob,updateJob != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 

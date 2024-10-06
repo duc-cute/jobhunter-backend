@@ -4,11 +4,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.response.ResCreateJobDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateJobDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 
 import java.util.List;
@@ -21,11 +23,13 @@ public class JobService {
     private final JobRepository jobRepository;
 
     private final SkillService skillService;
+    private final CompanyRepository companyRepository;
 
     public JobService(JobRepository jobRepository,
-                      SkillService skillService) {
+                      SkillService skillService,CompanyRepository companyRepository) {
         this.jobRepository = jobRepository;
         this.skillService = skillService;
+        this.companyRepository=companyRepository
     }
 
     public ResCreateJobDTO handleCreateJob(Job dto) {
@@ -36,6 +40,14 @@ public class JobService {
             dto.setSkills(dbSkills);
 
 
+        }
+
+        if(dto.getCompany() != null) {
+            Optional<Company> c = this.companyRepository.findById(dto.getCompany().getId());
+            if(c.isPresent()) {
+                dto.setCompany(c.get());
+
+            }
         }
         ResCreateJobDTO newJob = new ResCreateJobDTO();
         Job job = this.jobRepository.save(dto);
@@ -69,37 +81,55 @@ public class JobService {
         return null;
     }
 
-    public ResUpdateJobDTO handleUpdateJob(Job dto)  {
+    public ResUpdateJobDTO handleUpdateJob(Job dto,Job jobInDb)  {
             if(dto.getSkills() != null) {
                 List<Long> listSkill = dto.getSkills()
                         .stream().map(item -> item.getId()).collect(Collectors.toList());
                 List<Skill> dbSkills = this.skillService.findByIdIn(listSkill);
-                dto.setSkills(dbSkills);
+                jobInDb.setSkills(dbSkills);
             }
 
-            Job currentJob = this.jobRepository.save(dto);
-
-            if(currentJob != null) {
-
-                ResUpdateJobDTO updateJobDto = new ResUpdateJobDTO();
-                updateJobDto.setActive(currentJob.isActive());
-                updateJobDto.setId(currentJob.getId());
-                updateJobDto.setLevel(currentJob.getLevel());
-                updateJobDto.setLocation(currentJob.getLocation());
-                updateJobDto.setSalary(currentJob.getSalary());
-                updateJobDto.setQuantity(currentJob.getQuantity());
-                updateJobDto.setName(currentJob.getName());
-                updateJobDto.setUpdatedAt(currentJob.getUpdatedAt());
-                updateJobDto.setSkills(currentJob.getSkills()
-                        .stream().map(item -> item.getName()).collect(Collectors.toList())
-                );
-                updateJobDto.setEndDate(currentJob.getEndDate());
-                updateJobDto.setStartDate(currentJob.getStartDate());
-
-                return updateJobDto;
+        if(dto.getCompany() != null) {
+            Optional<Company> c = this.companyRepository.findById(dto.getCompany().getId());
+            if(c.isPresent()) {
+                jobInDb.setCompany(c.get());
 
             }
-            return null;
+        }
+
+        jobInDb.setName(dto.getName());
+        jobInDb.setActive(dto.isActive());
+        jobInDb.setId(dto.getId());
+        jobInDb.setEndDate(dto.getEndDate());
+        jobInDb.setStartDate(dto.getStartDate());
+        jobInDb.setLevel(dto.getLevel());
+        jobInDb.setLocation(dto.getLocation());
+        jobInDb.setSalary(dto.getSalary());
+
+
+        Job currentJob = this.jobRepository.save(jobInDb);
+
+        if(currentJob != null) {
+
+            ResUpdateJobDTO updateJobDto = new ResUpdateJobDTO();
+            updateJobDto.setActive(currentJob.isActive());
+            updateJobDto.setId(currentJob.getId());
+            updateJobDto.setLevel(currentJob.getLevel());
+            updateJobDto.setLocation(currentJob.getLocation());
+            updateJobDto.setSalary(currentJob.getSalary());
+            updateJobDto.setQuantity(currentJob.getQuantity());
+            updateJobDto.setName(currentJob.getName());
+            updateJobDto.setUpdatedAt(currentJob.getUpdatedAt());
+            updateJobDto.setSkills(currentJob.getSkills()
+                    .stream().map(item -> item.getName()).collect(Collectors.toList())
+            );
+            updateJobDto.setEndDate(currentJob.getEndDate());
+            updateJobDto.setStartDate(currentJob.getStartDate());
+
+            return updateJobDto;
+
+        }
+        return null;
 
 
 

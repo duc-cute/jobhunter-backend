@@ -12,6 +12,7 @@ import vn.hoidanit.jobhunter.domain.request.ReqCompanyDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
+import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -46,5 +47,15 @@ public class CompanyController {
     public ResponseEntity<Void> deleteCompany(@PathVariable long id) {
         this.companyService.deleteCompany(id);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/companies/{id}")
+    @ApiMessage("Fetch company by id")
+    public ResponseEntity<Company> fetchCompanyById(@PathVariable long id) throws IdInvalidException {
+        Company company = this.companyService.getCompanyById(id);
+        if(company == null) throw  new IdInvalidException("Company is not found");
+        return ResponseEntity.ok().body(company);
+
+
     }
 }
