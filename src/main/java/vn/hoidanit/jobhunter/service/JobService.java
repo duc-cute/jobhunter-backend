@@ -29,7 +29,7 @@ public class JobService {
                       SkillService skillService,CompanyRepository companyRepository) {
         this.jobRepository = jobRepository;
         this.skillService = skillService;
-        this.companyRepository=companyRepository
+        this.companyRepository=companyRepository;
     }
 
     public ResCreateJobDTO handleCreateJob(Job dto) {
