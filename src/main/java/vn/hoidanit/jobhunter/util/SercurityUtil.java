@@ -39,7 +39,12 @@ public class SercurityUtil {
     @Value("${duccute.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public String createAccessToken(String email,ResLoginDTO.UserLogin dto ) {
+    public String createAccessToken(String email,ResLoginDTO dto ) {
+        ResLoginDTO.UserInsightToken userToken = new ResLoginDTO.UserInsightToken();
+        userToken.setId(dto.getUser().getId());
+        userToken.setName(dto.getUser().getName());
+        userToken.setEmail(dto.getUser().getEmail());
+
         Instant now = Instant.now();
         Instant validity =now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);//tính thời gian hết hạn = lấy now + thời gian expire
 
@@ -50,7 +55,7 @@ public class SercurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("duccute",dto)
+                .claim("duccute",userToken)
                 .claim("permission",listAuthority)
                 .build();
 
@@ -61,6 +66,10 @@ public class SercurityUtil {
     }
 
     public String createRefreshToken(String email, ResLoginDTO dto) {
+        ResLoginDTO.UserInsightToken userToken = new ResLoginDTO.UserInsightToken();
+        userToken.setId(dto.getUser().getId());
+        userToken.setName(dto.getUser().getName());
+        userToken.setEmail(dto.getUser().getEmail());
         Instant now = Instant.now();
         Instant validity =now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);//tính thời gian hết hạn = lấy now + thời gian expire
 
@@ -68,7 +77,7 @@ public class SercurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user",dto.getUser())
+                .claim("user",userToken)
                 .build();
 
         JwsHeader jwsHeader =JwsHeader.with(JWT_ALGORITHM).build();

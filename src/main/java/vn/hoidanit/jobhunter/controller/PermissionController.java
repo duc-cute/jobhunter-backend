@@ -18,10 +18,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/permission")
 public class PermissionController {
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-
+    public PermissionController(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
 
     @PostMapping("/")
     @ApiMessage("create a permission")
@@ -62,7 +63,7 @@ public class PermissionController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @GetMapping("/{id}")
+    @DeleteMapping("/{id}")
     @ApiMessage("Delete a permission")
     public ResponseEntity<Void> deletePermission(@PathVariable long id) throws IdInvalidException {
         Optional<Permission> p = this.permissionService.getAPermission(id);

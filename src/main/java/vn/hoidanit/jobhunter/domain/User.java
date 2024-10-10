@@ -43,9 +43,15 @@ public class User {
     @JoinColumn(name = "company_id")
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name ="role_id")
+    private Role role;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     List<Resume> resumes;
+
+
 
 
 

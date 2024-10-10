@@ -59,11 +59,12 @@ public class AuthController {
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
                     userInDB.getId(),
                     userInDB.getEmail(),
-                    userInDB.getName()
+                    userInDB.getName(),
+                    userInDB.getRole()
             );
             res.setUser(userLogin);
         }
-        String access_token = this.sercurityUtil.createAccessToken(authentication.getName(),res.getUser());
+        String access_token = this.sercurityUtil.createAccessToken(authentication.getName(),res);
         res.setAccessToken(access_token);
 
         //create token
@@ -127,12 +128,13 @@ public class AuthController {
             ResLoginDTO.UserLogin userLogin =new ResLoginDTO.UserLogin(
                     currentUser.getId(),
                     currentUser.getEmail(),
-                    currentUser.getName()
+                    currentUser.getName(),
+                    currentUser.getRole()
             );
                     res.setUser(userLogin);
 
         }
-        String accessToken = this.sercurityUtil.createAccessToken(email,res.getUser());
+        String accessToken = this.sercurityUtil.createAccessToken(email,res);
         res.setAccessToken(accessToken);
 
         String newRefreshToken = this.sercurityUtil.createRefreshToken(email,res);

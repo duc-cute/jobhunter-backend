@@ -1,5 +1,11 @@
 package vn.hoidanit.jobhunter.service;
 
+import com.turkraft.springfilter.builder.FilterBuilder;
+import com.turkraft.springfilter.converter.FilterSpecification;
+import com.turkraft.springfilter.converter.FilterSpecificationConverter;
+import com.turkraft.springfilter.parser.FilterParser;
+import com.turkraft.springfilter.parser.node.FilterNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,6 +17,7 @@ import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.*;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.ResumeRepository;
+import vn.hoidanit.jobhunter.util.SercurityUtil;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import java.util.List;
@@ -25,6 +32,16 @@ public class ResumeService {
     private final  JobService jobService;
 
     private  final UserService userService;
+
+    @Autowired
+    FilterBuilder fb;
+
+    @Autowired
+    private FilterParser filterParser;
+
+    @Autowired
+    private FilterSpecificationConverter filterSpecificationConverter;
+
 
     public ResumeService(ResumeRepository resumeRepository,
                          JobService jobService,
@@ -104,7 +121,25 @@ public class ResumeService {
 
     }
 
-    public void delete(long id) {
+    public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
+        String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() : "";
+        FilterNode node =filterParser.parse("email='"+email+"'");
+        FilterSpecification<Resume> spec =filterSpecificationConverter.convert(node);
+        Page<Resume> pResumes= this.resumeRepository.findAll(spec,pageable);
+        ResultPaginationDTO result = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+        mt.setPage(pageable.getPageNumber() +1);
+        mt.setPageSize(pageable.getPageSize());
+        mt.setTotal(pResumes.getTotalElements());
+        mt.setPages(pResumes.getTotalPages());
+        result.setMeta(mt);
+        List<ResFetchResumeDTO> fetchResume = pResumes.getContent().stream().map(item ->this.getResume(item)).collect(Collectors.toList());
+        result.setResult(fetchResume);
+        return result;
+    }
+
+
+        public void delete(long id) {
         this.resumeRepository.deleteById(id);
     }
 

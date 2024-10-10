@@ -17,7 +17,7 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/role")
+@RequestMapping("/api/v1/roles")
 public class RoleController {
     private final RoleService roleService;
 
@@ -28,10 +28,10 @@ public class RoleController {
     @PostMapping("/")
     @ApiMessage("create a role")
     public ResponseEntity<Role> handleCreate(@RequestBody Role dto) throws IdInvalidException {
-        boolean isExistRole = this.roleService.isExistRole(dto.getName());
-        if (isExistRole) {
-            throw  new IdInvalidException("Role is exist!");
-        }
+//        boolean isExistRole = this.roleService.isExistRole(dto.getName());
+//        if (isExistRole) {
+//            throw  new IdInvalidException("Role is exist!");
+//        }
         Role role = this.roleService.save(dto);
         return new ResponseEntity<>(role,role != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
@@ -39,10 +39,10 @@ public class RoleController {
     @PutMapping("/")
     @ApiMessage("Update a role")
     public ResponseEntity<Role> handleUpdate(@RequestBody Role dto) throws IdInvalidException  {
-        boolean isExistRole = this.roleService.isExistRole(dto.getName());
-        if (isExistRole) {
-            throw  new IdInvalidException("Role has been duplicated!");
-        }
+//        boolean isExistRole = this.roleService.isExistRole(dto.getName());
+//        if (isExistRole) {
+//            throw  new IdInvalidException("Role has been duplicated!");
+//        }
         Optional<Role> opRole = this.roleService.getARole(dto.getId());
         if(opRole.isEmpty()) {
             throw  new IdInvalidException("Role is not found!");

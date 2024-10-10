@@ -1,5 +1,6 @@
 package vn.hoidanit.jobhunter.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,11 +16,16 @@ import java.util.List;
 @Setter
 public class Role {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank(message = "name is required")
     private String name;
     private String description;
     private boolean active;
+
+    @OneToMany(mappedBy = "role",fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<User> users;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"roles"})

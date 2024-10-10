@@ -17,6 +17,7 @@ import java.util.List;
 public class Permission {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank(message = "name is required")
     private String name;
