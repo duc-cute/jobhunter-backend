@@ -3,16 +3,19 @@ package vn.hoidanit.jobhunter.controller;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.request.ReqLoginDTO;
+import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResLoginDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.SercurityUtil;
@@ -28,17 +31,33 @@ public class AuthController {
 
     private final UserService userService;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Value("${duccute.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder,
                           SercurityUtil sercurityUtil,
-                          UserService userService
+                          UserService userService,
+                          PasswordEncoder passwordEncoder
                           ) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.sercurityUtil = sercurityUtil;
         this.userService = userService;
+        this.passwordEncoder=passwordEncoder;
 
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ResCreateUserDTO> register(@RequestBody User user) throws IdInvalidException {
+        boolean isExistUser = this.userService.isEmailExist(user.getEmail());
+        if(isExistUser) {
+            throw new IdInvalidException("Email :"+user.getEmail()+"disiss exist!");
+        }
+        String password = this.passwordEncoder.encode(user.getPassword());
+        user.setPassword(password);
+        User newUser = this.userService.handleCreateUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser));
     }
 
     @PostMapping("/login")
@@ -87,6 +106,7 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE,resCookie.toString()).body(res);
     }
+
     @GetMapping("/account")
     @ApiMessage("Fetch account")
     public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
@@ -153,6 +173,7 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE,resCookie.toString()).body(res);
 
     }
+
     @PostMapping("/logout")
     @ApiMessage("logout")
     public ResponseEntity<Void> logout() throws IdInvalidException {

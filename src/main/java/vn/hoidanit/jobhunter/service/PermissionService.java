@@ -35,6 +35,10 @@ public class PermissionService {
         );
     }
 
+    public  boolean isSameName(Permission p) {
+        return this.permissionRepository.existsByName(p.getName());
+    }
+
     public Permission update(Permission p,Permission permissionDb) {
         permissionDb.setName(p.getName());
         permissionDb.setMethod(p.getMethod());

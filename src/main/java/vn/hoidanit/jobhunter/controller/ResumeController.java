@@ -41,7 +41,7 @@ public class ResumeController {
         ResCreateResumeDTO newResume = this.resumeService.handleCreateResume(dto);
         return new ResponseEntity(newResume,newResume != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
-    @PutMapping("/resume")
+    @PutMapping("/resumes")
     @ApiMessage("Update resumes")
     public ResponseEntity<ResUpdateResumeDTO> updateResume( @RequestBody Resume dto) throws  IdInvalidException {
         Optional<Resume> currentResume  =this.resumeService.getById(dto.getId());

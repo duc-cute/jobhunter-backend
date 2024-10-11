@@ -36,6 +36,17 @@ public class Permission {
     private Instant updatedAt;
     private String updatedBy;
 
+    public Permission() {
+
+    }
+
+    public Permission(String name, String apiPath, String method, String module) {
+        this.name = name;
+        this.apiPath = apiPath;
+        this.method = method;
+        this.module = module;
+    }
+
     @PrePersist
     public void handleBeforeCreate() {
         this.createdBy = SercurityUtil.getCurrentUserLogin().isPresent() == true

@@ -16,7 +16,7 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/permission")
+@RequestMapping("/api/v1/permissions")
 public class PermissionController {
     private final PermissionService permissionService;
 
@@ -28,7 +28,11 @@ public class PermissionController {
     @ApiMessage("create a permission")
     public ResponseEntity<Permission> create(@RequestBody Permission dto) throws IdInvalidException {
         boolean isExistPermission = this.permissionService.isPermissionExist(dto);
-        if(isExistPermission) throw new IdInvalidException("Permission is exist!");
+        if(isExistPermission) {
+            if(this.permissionService.isSameName(dto)) {
+                throw new IdInvalidException("Permission is exist!");
+            }
+        }
         Permission permission = this.permissionService.handleCreate(dto);
         return new ResponseEntity<>(permission,permission != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
@@ -56,7 +60,7 @@ public class PermissionController {
         return new ResponseEntity<>(permission.get(),permission.isPresent() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/paging-permission")
+    @GetMapping("/")
     @ApiMessage("Fetch all permissions")
     public ResponseEntity<ResultPaginationDTO> pagingPermissions(@Filter Specification<Permission> spec, Pageable pageable) {
         ResultPaginationDTO result =this.permissionService.getAllPermission(spec,pageable);
