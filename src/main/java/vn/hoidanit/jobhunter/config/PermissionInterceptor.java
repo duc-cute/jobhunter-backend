@@ -41,7 +41,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
                 Role role = currentUser.getRole();
                 if(role != null) {
                     List<Permission> listPermission = role.getPermissions();
-                    boolean isAlow = listPermission.stream().allMatch(p -> p.getApiPath().equals(requestURI)
+                    boolean isAlow = listPermission.stream().anyMatch(p -> p.getApiPath().equals(requestURI)
                             && p.getMethod().equals(httpMethod));
                     if(!isAlow) {
                         throw new PermissionException("Bạn không có quyền truy cập endpoint này!");

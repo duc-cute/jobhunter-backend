@@ -24,7 +24,7 @@ public class PermissionController {
         this.permissionService = permissionService;
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @ApiMessage("create a permission")
     public ResponseEntity<Permission> create(@RequestBody Permission dto) throws IdInvalidException {
         boolean isExistPermission = this.permissionService.isPermissionExist(dto);
@@ -37,7 +37,7 @@ public class PermissionController {
         return new ResponseEntity<>(permission,permission != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     @ApiMessage("updated a permission")
     public  ResponseEntity<Permission> update(@RequestBody Permission dto) throws IdInvalidException {
         Optional<Permission> permissionDb = this.permissionService.getAPermission(dto.getId());
@@ -60,7 +60,7 @@ public class PermissionController {
         return new ResponseEntity<>(permission.get(),permission.isPresent() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @ApiMessage("Fetch all permissions")
     public ResponseEntity<ResultPaginationDTO> pagingPermissions(@Filter Specification<Permission> spec, Pageable pageable) {
         ResultPaginationDTO result =this.permissionService.getAllPermission(spec,pageable);

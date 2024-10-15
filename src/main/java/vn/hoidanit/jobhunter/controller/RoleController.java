@@ -25,7 +25,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @ApiMessage("create a role")
     public ResponseEntity<Role> handleCreate(@RequestBody Role dto) throws IdInvalidException {
 //        boolean isExistRole = this.roleService.isExistRole(dto.getName());
@@ -36,7 +36,7 @@ public class RoleController {
         return new ResponseEntity<>(role,role != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     @ApiMessage("Update a role")
     public ResponseEntity<Role> handleUpdate(@RequestBody Role dto) throws IdInvalidException  {
 //        boolean isExistRole = this.roleService.isExistRole(dto.getName());
@@ -61,7 +61,7 @@ public class RoleController {
         return new ResponseEntity<>(role.get(),role.isPresent() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @ApiMessage("Get all role")
     public ResponseEntity<ResultPaginationDTO> fetchAllRole(@Filter Specification spec, Pageable pageable) {
         ResultPaginationDTO result = this.roleService.getAllRole(spec,pageable);
