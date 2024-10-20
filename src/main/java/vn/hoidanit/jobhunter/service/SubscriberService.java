@@ -6,9 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.Subscriber;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.response.email.ResEmailJobDTO;
+import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 import vn.hoidanit.jobhunter.repository.SubscriberRepository;
 
@@ -20,14 +23,15 @@ import java.util.stream.Collectors;
 public class SubscriberService {
   private final SubscriberRepository subscriberRepository;
 
-  private final SkillRepository skillRepository;
-
-    public SubscriberService(SubscriberRepository subscriberRepository, SkillRepository skillRepository) {
+    private final SkillRepository skillRepository;
+    private final JobRepository jobRepository;
+    private final EmailService emailService;
+    public SubscriberService(SubscriberRepository subscriberRepository, SkillRepository skillRepository, JobRepository jobRepository, EmailService emailService) {
         this.subscriberRepository = subscriberRepository;
         this.skillRepository = skillRepository;
+        this.jobRepository = jobRepository;
+        this.emailService = emailService;
     }
-
-
 
     public boolean isEmailExist(String email) {
        return this.subscriberRepository.existsByEmail(email);
@@ -71,6 +75,43 @@ public class SubscriberService {
         result.setMeta(mt);
         result.setResult(pSubscriber.getContent());
         return result;
+    }
+
+    public ResEmailJobDTO convertToJobEmail(Job job) {
+        ResEmailJobDTO resEmailJobDTO = new ResEmailJobDTO();
+        resEmailJobDTO.setName(job.getName());
+        resEmailJobDTO.setSalary(job.getSalary());
+        resEmailJobDTO.setLevel(job.getLevel());
+        resEmailJobDTO.setQuantity(job.getQuantity());
+        resEmailJobDTO.setCompany(new ResEmailJobDTO.CompanyEmail((job.getCompany().getName())));
+        List<Skill> skills = job.getSkills();
+        List<ResEmailJobDTO.SkillEmail> skillEmails = skills.stream().map(skill -> new ResEmailJobDTO.SkillEmail(skill.getName())).collect(Collectors.toList());
+        resEmailJobDTO.setSkills(skillEmails);
+        return resEmailJobDTO;
+
+    }
+
+    public void sendSubscribersEmailJobs() {
+        //lấy ra all subscriber;
+        //lặp qua ,mỗi subscriber có skill đăng kí riêng từ đó lấy những job có những skill đó,
+        //có job rồi thì sẽ convert và gửi mail những job đó
+        List<Subscriber> allSubscribers = this.subscriberRepository.findAll();
+        if(!CollectionUtils.isEmpty(allSubscribers)) {
+            for (Subscriber sub : allSubscribers) {
+                List<Skill> listSkill = sub.getSkills();
+                if(!CollectionUtils.isEmpty(listSkill)) {
+                    List<Job> listJob = this.jobRepository.findBySkillsIn(listSkill);
+                    if(!CollectionUtils.isEmpty(listJob)) {
+                        List<ResEmailJobDTO> res = listJob.stream().map(item -> this.convertToJobEmail(item)).collect(Collectors.toList());
+                        this.emailService.sendMailFromTemplateSync(
+                                sub.getEmail(),
+                                "Cơ hội việc làm đang chờ bạn,khám phá ngay",
+                                "job", sub.getName(), res);
+                    }
+                }
+            }
+        }
+
     }
 
 }

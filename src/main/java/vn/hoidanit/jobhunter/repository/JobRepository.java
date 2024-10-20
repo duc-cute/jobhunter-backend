@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job,Long> , JpaSpecificationExecutor<Job> {
+    List<Job> findBySkillsIn(List<Skill> skill);
 
 }

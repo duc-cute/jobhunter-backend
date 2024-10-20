@@ -7,11 +7,13 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Service
 public class EmailService {
@@ -27,15 +29,6 @@ public class EmailService {
         this.springTemplateEngine = springTemplateEngine;
     }
 
-
-    public  void sendEmail() {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo("20211841@eaut.edu.vn");
-        msg.setSubject("Testing");
-        msg.setText("Hello word from spring");
-        this.mailSender.send(msg);
-
-    }
 
     public void sendMailSync(String to,String subject,String content,boolean isMultipart,boolean isHtml) {
         MimeMessage mimeMessage = this.javaMailSender.createMimeMessage();
@@ -53,8 +46,13 @@ public class EmailService {
 
     }
 
-    public void sendMailFromTemplateSync(String to,String subject,String templateName) {
+    @Async
+    public void sendMailFromTemplateSync(String to,String subject,String templateName,String userName,Object data) {
         Context context = new Context();
+
+        context.setVariable("name",userName);
+        context.setVariable("jobs",data);
+
         String content = springTemplateEngine.process(templateName,context);
         this.sendMailSync(to,subject,content,false,true);
 
