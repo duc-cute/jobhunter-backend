@@ -51,7 +51,7 @@ public class PermissionService {
         ResultPaginationDTO dto = new ResultPaginationDTO();
         Page<Permission> pPermission = this.permissionRepository.findAll(spec,pageable);
         ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
-        meta.setPages(pageable.getPageNumber() +1);
+        meta.setPage(pageable.getPageNumber() +1);
         meta.setPageSize(pageable.getPageSize());
         meta.setTotal(pPermission.getTotalElements());
         meta.setPages(pPermission.getTotalPages());

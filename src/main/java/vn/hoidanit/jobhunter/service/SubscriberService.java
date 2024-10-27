@@ -4,6 +4,7 @@ import com.turkraft.springfilter.boot.Filter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.hoidanit.jobhunter.domain.Job;
@@ -113,5 +114,13 @@ public class SubscriberService {
         }
 
     }
+
+    public Subscriber findByEmail(String email) {
+        return this.subscriberRepository.findByEmail(email);
+    }
+//    @Scheduled(cron = "*/10 * * * * *")
+//    public void testCron() {
+//        System.out.println("test cron");
+//    }
 
 }

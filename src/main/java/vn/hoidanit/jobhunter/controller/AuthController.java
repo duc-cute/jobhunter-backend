@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.request.ReqChangePasswordDTO;
 import vn.hoidanit.jobhunter.domain.request.ReqLoginDTO;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResLoginDTO;
@@ -61,17 +62,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO loginDTO) {
+    public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO loginDTO) throws IdInvalidException {
 //        Nạp input username ,password vào Security
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
-                (loginDTO.getUserName(),loginDTO.getPassword());
+                (loginDTO.getUsername(),loginDTO.getPassword());
 
 //        Tiến hành xác thực
         Authentication authentication =authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        if(!authentication.isAuthenticated()) throw new IdInvalidException("Thông tin đăng nhập không chính xác");
 
         // set thông tin người dùng đăng nhập vào context (có thể sử dụng sau này)
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        User userInDB = this.userService.handleGetUserByUserName(loginDTO.getUserName());
+        User userInDB = this.userService.handleGetUserByUserName(loginDTO.getUsername());
 
         ResLoginDTO res = new ResLoginDTO();
         if(userInDB != null) {
@@ -79,7 +81,10 @@ public class AuthController {
                     userInDB.getId(),
                     userInDB.getEmail(),
                     userInDB.getName(),
-                    userInDB.getRole()
+                    userInDB.getRole(),
+                    userInDB.getAddress(),
+                    userInDB.getAge(),
+                    userInDB.getGender()
             );
             res.setUser(userLogin);
         }
@@ -87,10 +92,10 @@ public class AuthController {
         res.setAccessToken(access_token);
 
         //create token
-        String refreshToken = sercurityUtil.createRefreshToken(loginDTO.getUserName(),res);
+        String refreshToken = sercurityUtil.createRefreshToken(loginDTO.getUsername(),res);
 
         //update in db
-        this.userService.updateUserToken(refreshToken, loginDTO.getUserName());
+        this.userService.updateUserToken(refreshToken, loginDTO.getUsername());
 
         //set cookie
         ResponseCookie resCookie = ResponseCookie
@@ -107,6 +112,24 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE,resCookie.toString()).body(res);
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@RequestBody ReqChangePasswordDTO dto) throws IdInvalidException {
+        String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() : "";
+        User currentUser = this.userService.handleGetUserByUserName(email);
+        if(currentUser != null) {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
+                    (currentUser.getEmail(),dto.getCurrentPass());
+            //        Tiến hành xác thực
+            Authentication authentication =authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            if(!authentication.isAuthenticated()) throw new IdInvalidException("Thông tin đăng nhập không chính xác");
+
+            String password = this.passwordEncoder.encode(dto.getNewPass());
+            currentUser.setPassword(password);
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
     @GetMapping("/account")
     @ApiMessage("Fetch account")
     public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
@@ -121,6 +144,10 @@ public class AuthController {
             userLgin.setId(currentUser.getId());
             userLgin.setName(currentUser.getName());
             userLgin.setEmail(currentUser.getEmail());
+            userLgin.setRole(currentUser.getRole());
+            userLgin.setGender(currentUser.getGender());
+            userLgin.setAddress(currentUser.getAddress());
+            userLgin.setAge(currentUser.getAge());
             userGetAccount.setUser(userLgin);
 
         }
@@ -149,7 +176,10 @@ public class AuthController {
                     currentUser.getId(),
                     currentUser.getEmail(),
                     currentUser.getName(),
-                    currentUser.getRole()
+                    currentUser.getRole(),
+                    currentUser.getAddress(),
+                    currentUser.getAge(),
+                    currentUser.getGender()
             );
                     res.setUser(userLogin);
 

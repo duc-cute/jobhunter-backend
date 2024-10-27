@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.hoidanit.jobhunter.domain.Role;
+import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Getter
 @Setter
@@ -34,6 +35,9 @@ public class ResLoginDTO {
         private String email;
         private String name;
         private Role role;
+        private String address;
+        private int age;
+        private GenderEnum gender;
     }
 
     @Getter

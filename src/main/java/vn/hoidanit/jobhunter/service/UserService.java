@@ -12,6 +12,7 @@ import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
+import vn.hoidanit.jobhunter.util.SercurityUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +89,8 @@ public class UserService {
     }
 
     public User updateUser(User userUpdate) {
-        User currentUser = this.getUserById(userUpdate.getId());
+        String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() : "";
+        User currentUser = this.handleGetUserByUserName(email);
         if(userUpdate != null) {
             currentUser.setAge(userUpdate.getAge());
             currentUser.setName(userUpdate.getName());
@@ -127,6 +129,7 @@ public class UserService {
         res.setAge(user.getAge());
         res.setGender(user.getGender());
         res.setCreatedAt(user.getCreatedAt());
+        res.setId(user.getId());
         if(user.getCompany() != null) {
             companyUser.setId(user.getCompany().getId());
             companyUser.setName(user.getCompany().getName());
@@ -147,6 +150,7 @@ public class UserService {
         res.setGender(user.getGender());
         res.setUpdatedAt(user.getUpdatedAt());
         res.setAddress(user.getAddress());
+        res.setId(user.getId());
 
         if(user.getCompany() != null) {
             companyUser.setId(user.getCompany().getId());

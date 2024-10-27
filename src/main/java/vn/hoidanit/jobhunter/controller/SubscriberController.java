@@ -13,6 +13,7 @@ import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.SkillService;
 import vn.hoidanit.jobhunter.service.SubscriberService;
 import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.util.SercurityUtil;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
@@ -88,6 +89,13 @@ public class SubscriberController {
             throw new IdInvalidException("Subscriber is not found!");
         }
         return ResponseEntity.ok(null);
+    }
+
+    @PostMapping("/skills")
+    @ApiMessage("Get Subscriber's skill")
+    public ResponseEntity<Subscriber> getSubscribersSkill() throws IdInvalidException {
+        String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() : "";
+        return  ResponseEntity.ok().body(this.subscriberService.findByEmail(email));
     }
 
 

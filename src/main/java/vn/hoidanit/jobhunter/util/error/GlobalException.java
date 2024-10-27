@@ -23,11 +23,20 @@ public class GlobalException {
             UsernameNotFoundException.class,
             BadCredentialsException.class
     })
+
+    public ResponseEntity<RestResponse<Object>> handleAllException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        res.setMessage(ex.getMessage());
+        res.setError("Internal Server Error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+    }
+
     public ResponseEntity<RestResponse<Object>> handleException(Exception  ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Exception orccurs...");
+        res.setMessage(ex.getMessage());
+        res.setError("Exception orccurs...");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 
@@ -38,8 +47,8 @@ public class GlobalException {
     public  ResponseEntity<RestResponse<Object>> handleNotFoundException(Exception ex) {
       RestResponse<Object> res = new RestResponse<Object>();
       res.setStatusCode(HttpStatus.NOT_FOUND.value());
-      res.setError(ex.getMessage());
-      res.setMessage("404 Not Found.URL may not exits...");
+      res.setMessage(ex.getMessage());
+      res.setError("404 Not Found.URL may not exits...");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
@@ -65,8 +74,8 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> handleFileUploadException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Exception upload file...");
+        res.setMessage(ex.getMessage());
+        res.setError("Exception upload file...");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
@@ -76,8 +85,8 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> handlePermissionException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.FORBIDDEN.value());
-        res.setMessage("Forbidden");
-        res.setError(ex.getMessage());
+        res.setError("Forbidden");
+        res.setMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
