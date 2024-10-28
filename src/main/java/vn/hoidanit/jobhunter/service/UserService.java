@@ -174,6 +174,7 @@ public class UserService {
         ResUserDTO res  = new ResUserDTO();
         ResUserDTO.CompanyUser companyUser  = new ResUserDTO.CompanyUser();
         ResUserDTO.RoleUser roleUser = new ResUserDTO.RoleUser();
+        res.setId(user.getId());
         res.setName(user.getName());
         res.setAge(user.getAge());
         res.setGender(user.getGender());
