@@ -11,6 +11,7 @@ import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 import vn.hoidanit.jobhunter.util.SercurityUtil;
 
@@ -22,21 +23,21 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
 
-    private final CompanyService companyService;
+    private final CompanyRepository companyRepository;
 
     private final RoleService roleService;
 
     public UserService(UserRepository userRepository,
-                       CompanyService companyService,RoleService roleService) {
+                       CompanyRepository companyRepository,RoleService roleService) {
         this.userRepository = userRepository;
-        this.companyService = companyService;
+        this.companyRepository = companyRepository;
         this.roleService = roleService;
     }
 
     public User handleCreateUser(User user) {
         if(user.getCompany() != null) {
-            Company company = this.companyService.getCompanyById(user.getCompany().getId());
-            user.setCompany(company != null ? company : null);
+            Optional<Company> company = this.companyRepository.findById(user.getCompany().getId());
+            user.setCompany(company.isPresent() ? company.get() : null);
 
         }
 
@@ -98,8 +99,8 @@ public class UserService {
             currentUser.setGender(userUpdate.getGender());
 
             if(userUpdate.getCompany() != null) {
-                Company company = this.companyService.getCompanyById(currentUser.getCompany().getId());
-                currentUser.setCompany(company != null ? company : null);
+                Optional<Company> company = this.companyRepository.findById(currentUser.getCompany().getId());
+                currentUser.setCompany(company.isPresent() ? company.get() : null);
 
             }
             if(userUpdate.getRole() != null) {

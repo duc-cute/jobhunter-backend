@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.request.ReqCompanyDTO;
+import vn.hoidanit.jobhunter.domain.response.ResCompanyDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
@@ -38,8 +39,8 @@ public class CompanyController {
     }
 
     @PutMapping("/companies")
-    public ResponseEntity<Company> updateCompany(@RequestBody Company c) {
-        Company res = this.companyService.updateCompany(c);
+    public ResponseEntity<ResCompanyDTO> updateCompany(@RequestBody Company c) {
+        ResCompanyDTO res = this.companyService.updateCompany(c);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
@@ -51,8 +52,8 @@ public class CompanyController {
 
     @GetMapping("/companies/{id}")
     @ApiMessage("Fetch company by id")
-    public ResponseEntity<Company> fetchCompanyById(@PathVariable long id) throws IdInvalidException {
-        Company company = this.companyService.getCompanyById(id);
+    public ResponseEntity<ResCompanyDTO> fetchCompanyById(@PathVariable long id) throws IdInvalidException {
+        ResCompanyDTO company = this.companyService.getCompanyById(id);
         if(company == null) throw  new IdInvalidException("Company is not found");
         return ResponseEntity.ok().body(company);
 

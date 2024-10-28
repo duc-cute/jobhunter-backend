@@ -4,15 +4,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import vn.hoidanit.jobhunter.domain.Company;
+import vn.hoidanit.jobhunter.domain.Job;
+import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.request.ReqCompanyDTO;
+import vn.hoidanit.jobhunter.domain.response.ResCompanyDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyService {
@@ -47,36 +51,67 @@ public class CompanyService {
         meta.setTotal(pCompany.getTotalElements());
         meta.setPages(pCompany.getTotalPages());
         result.setMeta(meta);
-        result.setResult(pCompany.getContent());
+        List<ResCompanyDTO> listCompany = pCompany.getContent().stream().map(c -> this.convertResCompanyDTO(c)).collect(Collectors.toList());
+        result.setResult(listCompany);
         return result;
     }
 
-    public Company getCompanyById(long id) {
+    public ResCompanyDTO getCompanyById(long id) {
         Optional<Company> company = this.companyRepository.findById(id);
-        if(company.isPresent()) return company.get();
+        if(company.isPresent()) {
+            Company currentCompany = company.get();
+            ResCompanyDTO dto = convertResCompanyDTO(currentCompany);
+
+            return dto;
+        }
         return null;
     }
+    public ResCompanyDTO convertResCompanyDTO(Company c) {
+        ResCompanyDTO dto = new ResCompanyDTO();
+        dto.setId(c.getId());
+        dto.setName(c.getName());
+        if(!CollectionUtils.isEmpty(c.getJobs())) {
+            List<Job> jobs = c.getJobs();
+            Set<Skill> skills = new HashSet<>();
+            for (Job job : jobs) {
+                skills.addAll(job.getSkills());
 
-    public Company updateCompany(Company c) {
-        Company currentCompany = this.getCompanyById(c.getId());
-        if(currentCompany != null) {
+            }
+            dto.setJobs(jobs);
+            dto.setSkills(new ArrayList<>(skills));
+
+        }
+        dto.setDescription(c.getDescription());
+        dto.setAddress(c.getAddress());
+        dto.setLogo(c.getLogo());
+        dto.setUpdatedBy(c.getUpdatedBy());
+        dto.setUpdatedAt(c.getUpdatedAt());
+        dto.setCreatedBy(c.getCreatedBy());
+        dto.setCreatedAt(c.getCreatedAt());
+        return dto;
+    }
+
+    public ResCompanyDTO updateCompany(Company c) {
+        Optional<Company> opCompany = this.companyRepository.findById(c.getId());
+        if(opCompany.isPresent()) {
+            Company currentCompany = opCompany.get();
             currentCompany.setName(c.getName());
             currentCompany.setDescription(c.getDescription());
             currentCompany.setAddress(c.getAddress());
             currentCompany.setLogo(c.getLogo());
             this.companyRepository.save(currentCompany);
+            ResCompanyDTO dto = this.convertResCompanyDTO(currentCompany);
+            return  dto;
         }
-        return  currentCompany;
-
+        return  null;
     }
 
     public void deleteCompany(long id) {
-        Company currentCompany = this.getCompanyById(id);
-        if(currentCompany != null) {
-            List<User> users = this.userRepository.findByCompany(currentCompany);
+        Optional<Company> currentCompany = this.companyRepository.findById(id);
+        if(currentCompany.isPresent()) {
+            List<User> users = this.userRepository.findByCompany(currentCompany.get());
             this.userRepository.deleteAll(users);
-
-            this.companyRepository.deleteById(currentCompany.getId());
+            this.companyRepository.deleteById(currentCompany.get().getId());
         }
     }
 
