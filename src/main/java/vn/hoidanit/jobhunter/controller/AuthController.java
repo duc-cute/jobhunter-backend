@@ -125,6 +125,8 @@ public class AuthController {
 
             String password = this.passwordEncoder.encode(dto.getNewPass());
             currentUser.setPassword(password);
+            this.userService.handleSaveUser(currentUser);
+
         }
 
         return ResponseEntity.ok(null);
