@@ -25,6 +25,7 @@ import vn.hoidanit.jobhunter.service.ResumeService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class ResumeController {
     @GetMapping("/resumes")
     @ApiMessage("/Fetch resumes")
     public ResponseEntity<ResultPaginationDTO> fetchAllResume(@Filter Specification<Resume> spec, Pageable pageable) {
-        List<Long> allJobs = null;
+        List<Long> allJobs = new ArrayList<>();
         String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() : "";
         User currentUser = this.userService.handleGetUserByUserName(email);
         if(currentUser != null) {
@@ -89,11 +90,12 @@ public class ResumeController {
                 }
             }
         }
-        Specification<Resume> jobsInSpec = filterSpecificationConverter.convert(filterBuilder.field("job").in(filterBuilder.input(allJobs)).get());
+        Specification<Resume> jobsInSpec = allJobs.isEmpty() ? Specification.where(null) : filterSpecificationConverter.convert(filterBuilder.field("job").in(filterBuilder.input(allJobs)).get());
+        Specification<Resume> finalSpec = jobsInSpec != null ? spec.and(jobsInSpec) : spec;
+
         // filterBuilder.field("job"): Tạo bộ lọc dựa trên trường job của bảng Resume.
         // .in(filterBuilder.input(allJobs)): Đây là cách bạn lọc để chỉ lấy những Resume ứng tuyển vào các công việc có id trong danh sách allJobs.
         //   Sau đó bạn chuyển đổi nó thành một đối tượng Specification<Resume> thông qua filterSpecificationConverter.
-        Specification<Resume> finalSpec = jobsInSpec.and(spec);
 
         ResultPaginationDTO result = this.resumeService.getAllResumes(finalSpec,pageable);
         return ResponseEntity.status(HttpStatus.OK).body(result);
