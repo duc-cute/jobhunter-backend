@@ -105,6 +105,7 @@ public class JobService {
         jobInDb.setLevel(dto.getLevel());
         jobInDb.setLocation(dto.getLocation());
         jobInDb.setSalary(dto.getSalary());
+        jobInDb.setDescription(dto.getDescription());
 
 
         Job currentJob = this.jobRepository.save(jobInDb);
