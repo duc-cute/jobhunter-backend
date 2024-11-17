@@ -90,8 +90,8 @@ public class ResumeController {
                 }
             }
         }
-        Specification<Resume> jobsInSpec = allJobs.isEmpty() ? Specification.where(null) : filterSpecificationConverter.convert(filterBuilder.field("job").in(filterBuilder.input(allJobs)).get());
-        Specification<Resume> finalSpec = jobsInSpec != null ? spec.and(jobsInSpec) : spec;
+        Specification<Resume> jobsInSpec = filterSpecificationConverter.convert(filterBuilder.field("job").in(filterBuilder.input(allJobs)).get());
+        Specification<Resume> finalSpec = currentUser.getRole().getName().toUpperCase().equals("SUPER ADMIN") ? spec : spec.and(jobsInSpec) ;
 
         // filterBuilder.field("job"): Tạo bộ lọc dựa trên trường job của bảng Resume.
         // .in(filterBuilder.input(allJobs)): Đây là cách bạn lọc để chỉ lấy những Resume ứng tuyển vào các công việc có id trong danh sách allJobs.

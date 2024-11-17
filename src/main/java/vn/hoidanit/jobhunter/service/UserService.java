@@ -103,7 +103,7 @@ public class UserService {
             currentUser.setGender(userUpdate.getGender());
 
             if(userUpdate.getCompany() != null) {
-                Optional<Company> company = this.companyRepository.findById(currentUser.getCompany().getId());
+                Optional<Company> company = this.companyRepository.findById(userUpdate.getCompany().getId());
                 currentUser.setCompany(company.isPresent() ? company.get() : null);
 
             }
@@ -116,6 +116,31 @@ public class UserService {
             currentUser= this.userRepository.save(currentUser);
         }
         return currentUser;
+
+    }
+    public User updateUserByAdmin(User userUpdate) {
+        User user = this.getUserById(userUpdate.getId());
+
+        if(user != null && userUpdate != null) {
+            user.setAge(userUpdate.getAge());
+            user.setName(userUpdate.getName());
+            user.setAddress(userUpdate.getAddress());
+            user.setGender(userUpdate.getGender());
+
+            if(userUpdate.getCompany() != null) {
+                Optional<Company> company = this.companyRepository.findById(userUpdate.getCompany().getId());
+                user.setCompany(company.isPresent() ? company.get() : null);
+
+            }
+            if(userUpdate.getRole() != null) {
+                Optional<Role> role = this.roleService.getARole(userUpdate.getRole().getId());
+                user.setRole(role.isPresent()  ? role.get() : null);
+            }
+
+
+            user= this.userRepository.save(user);
+        }
+        return user;
 
     }
     public void updateUserToken(String token,String email) {

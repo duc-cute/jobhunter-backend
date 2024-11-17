@@ -74,4 +74,12 @@ public class UserController {
         return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(userUpdate));
 
     }
+    @PutMapping("/user-by-admin")
+    @ApiMessage("Update a user by admin")
+    public ResponseEntity<ResUpdateUserDTO> updateUserByAdmin(@RequestBody User user) throws IdInvalidException {
+        User userUpdate = this.userService.updateUserByAdmin(user);
+        if(userUpdate == null) throw new IdInvalidException("User với Id ="+ user.getId()+" không tồn tại!");
+        return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(userUpdate));
+
+    }
 }
