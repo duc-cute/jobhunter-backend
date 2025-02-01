@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.itviec.jobhunter.domain.Company;
 import vn.itviec.jobhunter.domain.Role;
 import vn.itviec.jobhunter.util.constant.GenderEnum;
 
@@ -38,6 +39,7 @@ public class ResLoginDTO {
         private String address;
         private int age;
         private GenderEnum gender;
+        private Company company;
     }
 
     @Getter

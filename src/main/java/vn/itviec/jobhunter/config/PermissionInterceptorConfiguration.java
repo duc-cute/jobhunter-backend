@@ -19,7 +19,8 @@ public class PermissionInterceptorConfiguration implements WebMvcConfigurer {
                 "/api/v1/resumes/**",
                 "/api/v1/hr-register/**",
                 "api/v1/hr-register-active",
-                "/api/v1/subscribers/**"
+                "/api/v1/subscribers/**",
+                "/api/v1/users"
 
         };
         registry.addInterceptor(getPermissionInterceptor())

@@ -84,7 +84,8 @@ public class AuthController {
                     userInDB.getRole(),
                     userInDB.getAddress(),
                     userInDB.getAge(),
-                    userInDB.getGender()
+                    userInDB.getGender(),
+                    userInDB.getCompany()
             );
             res.setUser(userLogin);
         }
@@ -149,6 +150,7 @@ public class AuthController {
             userLgin.setGender(currentUser.getGender());
             userLgin.setAddress(currentUser.getAddress());
             userLgin.setAge(currentUser.getAge());
+            userLgin.setCompany(currentUser.getCompany());
             userGetAccount.setUser(userLgin);
 
         }
@@ -180,7 +182,8 @@ public class AuthController {
                     currentUser.getRole(),
                     currentUser.getAddress(),
                     currentUser.getAge(),
-                    currentUser.getGender()
+                    currentUser.getGender(),
+                    currentUser.getCompany()
             );
                     res.setUser(userLogin);
 
