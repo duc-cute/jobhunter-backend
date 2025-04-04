@@ -143,6 +143,8 @@ public class UserService {
         return user;
 
     }
+
+
     public void updateUserToken(String token,String email) {
         User currentUser = this.handleGetUserByUserName(email);
         if(currentUser != null) {

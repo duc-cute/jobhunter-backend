@@ -67,16 +67,22 @@ public class JobController {
 
     @GetMapping("/jobs")
     @ApiMessage("/Fetch jobs")
-    public ResponseEntity<ResultPaginationDTO> fetchAllJob(@Filter Specification<Job> spec, Pageable pageable) {
+    public ResponseEntity<ResultPaginationDTO> fetchAllJobByUser(@Filter Specification<Job> spec, Pageable pageable) {
         String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() :"";
         User currentUser = this.userService.handleGetUserByUserName(email);
         if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        ResultPaginationDTO result = jobService.getAllJobs(spec, pageable);
+        ResultPaginationDTO result = jobService.getAllJobsByUser(spec, pageable);
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/jobs/public")
+    @ApiMessage("/Fetch jobs")
+    public ResponseEntity<ResultPaginationDTO> pagingAllJob(@Filter Specification<Job> spec, Pageable pageable) {
+        ResultPaginationDTO result = jobService.getAllJobs(spec, pageable);
+        return ResponseEntity.ok(result);
+    }
 
     @PostMapping("/paging-job")
     @ApiMessage("/Paging jobs")

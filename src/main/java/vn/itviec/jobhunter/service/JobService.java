@@ -154,7 +154,7 @@ public class JobService {
 
     }
 
-    public ResultPaginationDTO getAllJobs(Specification<Job> spec,Pageable pageable) {
+    public ResultPaginationDTO getAllJobsByUser(Specification<Job> spec,Pageable pageable) {
 
         String email = SercurityUtil.getCurrentUserLogin().isPresent() ? SercurityUtil.getCurrentUserLogin().get() :"";
         User currentUser = this.userService.handleGetUserByUserName(email);
@@ -170,6 +170,20 @@ public class JobService {
         }
         Page<Job> pJobs = this.jobRepository.findAll(spec, pageable);
 
+        ResultPaginationDTO result = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+        mt.setPage(pageable.getPageNumber() +1);
+        mt.setPageSize(pageable.getPageSize());
+        mt.setTotal(pJobs.getTotalElements());
+        mt.setPages(pJobs.getTotalPages());
+        result.setMeta(mt);
+        result.setResult(pJobs.getContent());
+        return result;
+
+    }
+
+    public ResultPaginationDTO getAllJobs(Specification<Job> spec,Pageable pageable) {
+        Page<Job> pJobs = this.jobRepository.findAll(spec, pageable);
         ResultPaginationDTO result = new ResultPaginationDTO();
         ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
         mt.setPage(pageable.getPageNumber() +1);

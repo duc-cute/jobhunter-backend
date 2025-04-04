@@ -26,6 +26,7 @@ public class HrRegister {
     private String permanentAddress;
     private String companyName;
     private String companyAddress;
+    private String companyId;
     private boolean isActive;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
